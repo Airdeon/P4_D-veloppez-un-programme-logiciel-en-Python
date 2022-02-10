@@ -1,0 +1,3 @@
+- finir la recupération de tournois
+- codé la class Tour
+- codé la class Match

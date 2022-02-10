@@ -22,6 +22,7 @@ def menu_principale():
                     Tournament(True)
                 case "3":
                     good_choice = True
+                    Tournament()
                 case "4":
                     good_choice = True
                     end_loop = True
