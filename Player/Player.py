@@ -4,7 +4,8 @@ class Player:
     db = TinyDB('./db.json')
     players_table = db.table('players')
 
-    def __init__(self, new_player=False):
+    def __init__(self, new_player=False, players_already_pick=[]):
+        self.players_already_pick = players_already_pick
         if new_player == True:
             self.new_player()
         else:
@@ -22,10 +23,21 @@ class Player:
         print("\nJoueur sauvegarder !")
 
     def show_player_list(self):
-        for number_of_player in range(self.players_table.count()):
-            player_line_serialized = self.players_table.get(number_of_player)
-            player_line = player_line_serialized['nom']
-            print(player_line)
+        valid_players=[]
+        total_number_of_player = self.players_table.count(all))
+        for number_of_player in range(total_number_of_player):
+            player_line_serialized = self.players_table.get(all, number_of_player+1)
+            player_line = str(number_of_player+1) + " " + player_line_serialized['nom'] + " " + player_line_serialized['prenom']
+            if number_of_player+1 not in self.players_already_pick:
+                valid_players.append(number_of_player+1)
+            if number_of_player+1 not in valid_players:
+                print(player_line)
+        print("entrer le numero du joueur à ajouter")
+        good_choice = False
+        while good_choice == False:
+            choice = input("choix : ")
+            if choice 
+
 
 
     def save_player(self):

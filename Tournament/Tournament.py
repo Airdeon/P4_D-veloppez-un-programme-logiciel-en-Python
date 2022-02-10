@@ -43,7 +43,7 @@ class Tournament:
     def get_players_choice(self):
         players = []
         for player_number in range(int(self.nombre_de_joueur)):
-            player = Player()
+            player = Player(False, players)
 
 
 class Tours:
