@@ -6,6 +6,14 @@ class Player:
 
 
     def __init__(self, new_player=False, players_already_pick=[], player_id=0):
+        ''' Init player object
+            send to a good method depends of arguments
+
+            Args :
+                new_player : true for create a new player
+                players_already_pick : list of player in tournament to make them unavailable to pick
+                player_id : id of an existing player in the database
+        '''
         self.players_already_pick = players_already_pick
         if new_player == True:
             self.new_player()
@@ -16,6 +24,7 @@ class Player:
 
 
     def new_player(self):
+        ''' Create new player and save it in the database '''
         self.nom = input("nom : ")
         self.prenom = input("prenom : ")
         self.date_de_naissance = input("date de naissance : ")
@@ -26,6 +35,11 @@ class Player:
 
 
     def get_player_from_database(self, player_id):
+        ''' Get one player from database
+
+        Args:
+            player_id : id of the player in database
+        '''
         player_line_serialized = self.players_table.get(all, player_id)
         self.nom = player_line_serialized['nom']
         self.prenom = player_line_serialized['prenom']
@@ -36,6 +50,7 @@ class Player:
 
 
     def show_player_list(self):
+        ''' Show a list of every player available '''
         valid_players=[]
         total_number_of_player = self.players_table.count(all)
         for number_of_player in range(total_number_of_player):
@@ -67,8 +82,9 @@ class Player:
 
 
     def save_player(self):
+        ''' Save player in tinydb database '''
         serialized_player = {
-            'nom': self.nom, 
+            'nom': self.nom,
             'prenom': self.prenom,
             'date_de_naissance': self.date_de_naissance,
             'sexe': self.sexe,

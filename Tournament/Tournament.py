@@ -10,13 +10,19 @@ class Tournament:
 
 
     def __init__(self, new_tournament=False):
+        ''' Init tournament object with diferent method depend of Arguments
+
+            Args :
+                new_tournament : True for create a new tournament, False for find an existing one
+        '''
         if new_tournament == True:
             self.new_tournaments()
         else:
             self.backup_tournament()
-    
+
 
     def new_tournaments(self):
+        ''' Create a new tournament and save it in the database'''
         self.nom = input("Nom du tournois : ")
         self.lieu = input("Lieu du tournois : ")
         self.date_de_debut = datetime.now()
@@ -45,24 +51,26 @@ class Tournament:
         self.description = input("Description : ")
         self.nombre_de_joueur = "8"
         self.joueurs = self.get_players_choice()
+        self.id_tournament = self.tournament_table.count(all) + 1
         self.save_tournament(True)
-        
-    
+
+
     def get_players_choice(self):
         players = []
         for player_number in range(int(self.nombre_de_joueur)):
             player = Player(False, players)
             players.append(player)
         return players
-    
+
     def backup_tournament(self):
+        ''' Reload an existing tournament from the database '''
         tournament = Query()
         tournament_line_serialized = self.tournament_table.search(tournament.date_de_fin == "")
         backup_tournament_number = 0
         for tournament in tournament_line_serialized:
             backup_tournament_number += 1
             print(str(backup_tournament_number) + " : " + tournament['nom'])
-            
+
         print("entrer le numero du tournois à continuer")
         good_choice = False
         while good_choice == False:
@@ -80,15 +88,14 @@ class Tournament:
                 self.nombre_de_joueur = backup_tournament['nombre_de_joueur']
                 tour_id = backup_tournament['tour'].split()
                 player_id = backup_tournament['joueurs'].split()
-                players = []
+                self.players = []
                 for player in player_id:
-                    players.append(Player(player_id=int(player)))
-
-
+                    self.players.append(Player(player_id=int(player)))
             else:
                 print("ce choix n'est pas valide !")
 
     def save_tournament(self, new=False):
+        ''' Save tournament in database'''
         player_id = ""
         for player in self.joueurs:
             player_id += str(player.id) + " "
@@ -110,7 +117,7 @@ class Tournament:
         if new:
             self.tournament_table.insert(serialized_tournament)
         else:
-            pass
+            self.tournament_table.update(set(self.id_tournament, serialized_tournament))
 
 
 class Tours:
