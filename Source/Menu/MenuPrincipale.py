@@ -1,9 +1,10 @@
 from Player.Player import Player
 from Tournament.Tournament import Tournament
 
+
 def menu_principale():
     end_loop = False
-    while end_loop == False:
+    while not end_loop:
         print("\n\n## Menu Principale ##\n")
         print("1 : Ajouter un nouveau joueur")
         print("2 : Débuter un nouveau tournois")
@@ -11,7 +12,7 @@ def menu_principale():
         print("4 : quiter le programme")
         print("\nentré le nombre correspondant a votre choix.")
         good_choice = False
-        while good_choice == False:
+        while not good_choice:
             choice = input("choix : ")
             match choice:
                 case "1":

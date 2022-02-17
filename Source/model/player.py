@@ -1,9 +1,9 @@
 from tinydb import TinyDB
 
+
 class Player:
     db = TinyDB('./db.json')
     players_table = db.table('players')
-
 
     def __init__(self, new_player=False, players_already_pick=[], player_id=0):
         ''' Init player object
@@ -15,13 +15,12 @@ class Player:
                 player_id : id of an existing player in the database
         '''
         self.players_already_pick = players_already_pick
-        if new_player == True:
+        if new_player:
             self.new_player()
         elif player_id > 0:
             self.get_player_from_database(player_id)
         else:
             self.show_player_list()
-
 
     def new_player(self):
         ''' Create new player and save it in the database '''
@@ -32,7 +31,6 @@ class Player:
         self.classement = input("classement : ")
         self.save_player()
         print("\nJoueur sauvegarder !")
-
 
     def get_player_from_database(self, player_id):
         ''' Get one player from database
@@ -47,7 +45,6 @@ class Player:
         self.sexe = player_line_serialized['sexe']
         self.classement = player_line_serialized['classement']
         self.id = player_id
-
 
     def show_player_list(self):
         ''' Show a list of every player available '''
@@ -79,7 +76,6 @@ class Player:
                 self.id = int(choice)
             else:
                 print("ce choix n'est pas valide !")
-
 
     def save_player(self):
         ''' Save player in tinydb database '''
