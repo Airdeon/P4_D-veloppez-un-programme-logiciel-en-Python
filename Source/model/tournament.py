@@ -1,12 +1,40 @@
 from datetime import datetime
 from tinydb import TinyDB, Query
-from Player.Player import Player
+
+class TournamentDataBase:
+    def __init__(self):
+        db = TinyDB('./db.json')
+        self.tournament_table = db.table('tournaments')
 
 
+    def save_tournament(self, new=False):
+        ''' Save tournament in database'''
+        player_id = ""
+        for player in self.joueurs:
+            player_id += str(player.id) + " "
+        tour_id = ""
+        for tour in self.tour:
+            tour_id += str(tour.id) + " "
+        serialized_tournament = {
+            'nom': self.nom,
+            'lieu': self.lieu,
+            'date_de_fin': str(self.date_de_fin),
+            'nombre_de_tour': self.nombre_de_tour,
+            'tour': tour_id,
+            'controle_du_temps': self.controle_du_temps,
+            'description': self.description,
+            'nombre_de_joueur': self.nombre_de_joueur,
+            'joueurs': player_id,
+        }
+        if new:
+            serialized_tournament["date_de_debut"] = datetime.now()
+            serialized_tournament["date_de_fin"] = ""
+            self.tournament_table.insert(serialized_tournament)
+        else:
+            self.tournament_table.update(set(self.id_tournament, serialized_tournament))
 
 class Tournament:
-    db = TinyDB('./db.json')
-    tournament_table = db.table('tournaments')
+
 
 
     def __init__(self, new_tournament=False):

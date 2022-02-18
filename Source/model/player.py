@@ -1,9 +1,52 @@
 from tinydb import TinyDB
 
 
+class PlayerDataBase:
+    def __init__(self):
+        db = TinyDB('./db.json')
+        self.players_table = db.table('players')
+
+    def save_new_player(self, player_info):
+        ''' save new player in the database '''
+        self.lastname = player_info["lastname"]
+        self.firstname = player_info["firstname"]
+        self.birthday = player_info["birthday"]
+        self.sex = player_info["sex"]
+        self.ranking = player_info["ranking"]
+        self.save_player()
+        print("\nJoueur sauvegarder !")
+
+    def save_player(self):
+        ''' Save player in tinydb database '''
+        serialized_player = {
+            'nom': self.lastname,
+            'prenom': self.firstname,
+            'date_de_naissance': self.birthday,
+            'sexe': self.sex,
+            'classement': self.ranking,
+        }
+        self.players_table.insert(serialized_player)
+
+    def get_player_available_list(self, players_already_pick):
+        ''' get a list of every player available '''
+        valid_players_id = []
+        valid_players_string = ""
+        total_number_of_player = self.players_table.count(all)
+        for index_player in range(1,total_number_of_player):
+            player_line_serialized = self.players_table.get(all, index_player)
+            player_line = str(index_player) + " " + player_line_serialized['nom'] + " " + player_line_serialized['prenom']
+            if not index_player in players_already_pick:
+                valid_players_id.append(index_player)
+                valid_players_string += player_line + "\n"
+        player_list = {
+            "valid_players_id": valid_players_id,
+            "valid_players_string": valid_players_string
+        }
+        return player_list
+
+
+
 class Player:
-    db = TinyDB('./db.json')
-    players_table = db.table('players')
 
     def __init__(self, new_player=False, players_already_pick=[], player_id=0):
         ''' Init player object
@@ -22,15 +65,6 @@ class Player:
         else:
             self.show_player_list()
 
-    def new_player(self):
-        ''' Create new player and save it in the database '''
-        self.nom = input("nom : ")
-        self.prenom = input("prenom : ")
-        self.date_de_naissance = input("date de naissance : ")
-        self.sexe = input("sexe : ")
-        self.classement = input("classement : ")
-        self.save_player()
-        print("\nJoueur sauvegarder !")
 
     def get_player_from_database(self, player_id):
         ''' Get one player from database
@@ -76,14 +110,3 @@ class Player:
                 self.id = int(choice)
             else:
                 print("ce choix n'est pas valide !")
-
-    def save_player(self):
-        ''' Save player in tinydb database '''
-        serialized_player = {
-            'nom': self.nom,
-            'prenom': self.prenom,
-            'date_de_naissance': self.date_de_naissance,
-            'sexe': self.sexe,
-            'classement': self.classement,
-        }
-        self.players_table.insert(serialized_player)
