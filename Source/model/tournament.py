@@ -1,11 +1,11 @@
 from datetime import datetime
 from tinydb import TinyDB, Query
 
+
 class TournamentDataBase:
     def __init__(self):
         db = TinyDB('./db.json')
         self.tournament_table = db.table('tournaments')
-
 
     def save_tournament(self, new=False):
         ''' Save tournament in database'''
@@ -33,10 +33,9 @@ class TournamentDataBase:
         else:
             self.tournament_table.update(set(self.id_tournament, serialized_tournament))
 
+
+
 class Tournament:
-
-
-
     def __init__(self, new_tournament=False):
         ''' Init tournament object with diferent method depend of Arguments
 

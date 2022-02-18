@@ -12,7 +12,7 @@ class View:
         good_choice = False
         while not good_choice:
             choice = input("choix : ")
-            if choice.isdigit and int(choice) > 0 and int(choice) <= number_of_choices:
+            if choice.isdigit() and int(choice) > 0 and int(choice) <= number_of_choices:
                 good_choice = True
             else:
                 print("le choix entré ne corespond pas à un choix valide. choisisser à nouveau")
@@ -46,4 +46,13 @@ class View:
     def choice_player(self, player_list):
         print(player_list["valid_players_string"])
         print("entrer le numero du joueur à ajouter")
-
+        print(player_list["valid_players_id"])
+        good_choice = False
+        while not good_choice:
+            choice = input("choix : ")
+            print(choice.isdigit())
+            if choice.isdigit() and int(choice) in player_list["valid_players_id"]:
+                good_choice = True
+            else:
+                print("le choix entré ne corespond pas à un choix valide. choisisser à nouveau")
+        return int(choice)

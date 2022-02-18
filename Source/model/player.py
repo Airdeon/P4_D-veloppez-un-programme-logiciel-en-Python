@@ -14,7 +14,6 @@ class PlayerDataBase:
         self.sex = player_info["sex"]
         self.ranking = player_info["ranking"]
         self.save_player()
-        print("\nJoueur sauvegarder !")
 
     def save_player(self):
         ''' Save player in tinydb database '''
@@ -32,10 +31,10 @@ class PlayerDataBase:
         valid_players_id = []
         valid_players_string = ""
         total_number_of_player = self.players_table.count(all)
-        for index_player in range(1,total_number_of_player):
+        for index_player in range(1, total_number_of_player+1):
             player_line_serialized = self.players_table.get(all, index_player)
             player_line = str(index_player) + " " + player_line_serialized['nom'] + " " + player_line_serialized['prenom']
-            if not index_player in players_already_pick:
+            if index_player not in players_already_pick:
                 valid_players_id.append(index_player)
                 valid_players_string += player_line + "\n"
         player_list = {
