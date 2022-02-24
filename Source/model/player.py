@@ -8,23 +8,18 @@ class PlayerDataBase:
 
     def save_new_player(self, player_info):
         ''' save new player in the database '''
-        self.lastname = player_info["lastname"]
-        self.firstname = player_info["firstname"]
-        self.birthday = player_info["birthday"]
-        self.sex = player_info["sex"]
-        self.ranking = player_info["ranking"]
-        self.save_player()
+        self.players_table.insert(player_info)
 
-    def save_player(self):
+    def save_player(self, Player):
         ''' Save player in tinydb database '''
         serialized_player = {
-            'nom': self.lastname,
-            'prenom': self.firstname,
-            'date_de_naissance': self.birthday,
-            'sexe': self.sex,
-            'classement': self.ranking,
+            'lastname': Player.lastname,
+            'firstname': Player.firstname,
+            'birthday': Player.birthday,
+            'sex': Player.sex,
+            'ranking': Player.ranking,
         }
-        self.players_table.insert(serialized_player)
+        self.players_table.update(set(Player.player_id, serialized_player))
 
     def get_player_available_list(self, players_already_pick):
         ''' get a list of every player available '''
@@ -43,41 +38,36 @@ class PlayerDataBase:
         }
         return player_list
 
-
-
-class Player:
-
-    def __init__(self, new_player=False, players_already_pick=[], player_id=0):
-        ''' Init player object
-            send to a good method depends of arguments
-
-            Args :
-                new_player : true for create a new player
-                players_already_pick : list of player in tournament to make them unavailable to pick
-                player_id : id of an existing player in the database
-        '''
-        self.players_already_pick = players_already_pick
-        if new_player:
-            self.new_player()
-        elif player_id > 0:
-            self.get_player_from_database(player_id)
-        else:
-            self.show_player_list()
-
-
     def get_player_from_database(self, player_id):
         ''' Get one player from database
 
-        Args:
-            player_id : id of the player in database
+            Args:
+                player_id : id of the player in database
         '''
-        player_line_serialized = self.players_table.get(all, player_id)
-        self.nom = player_line_serialized['nom']
-        self.prenom = player_line_serialized['prenom']
-        self.date_de_naissance = player_line_serialized['date_de_naissance']
-        self.sexe = player_line_serialized['sexe']
-        self.classement = player_line_serialized['classement']
-        self.id = player_id
+        player_information = self.players_table.get(all, player_id)
+        return player_information
+
+
+class Player:
+    def __init__(self, player_id):
+        ''' Init player object with player information on database
+
+            Args :
+                player_id : id of an existing player in the database
+        '''
+        # creation of database object
+        self.player_database = PlayerDataBase()
+        # player initialisation
+        player_serialized = PlayerDataBase.get_player_from_database(player_id)
+        self.lastname = player_serialized['lastname']
+        self.firstname = player_serialized['firstname']
+        self.birthday = player_serialized['birthday']
+        self.sex = player_serialized['sex']
+        self.ranking = player_serialized['ranking']
+        self.player_id = player_id
+    
+    def save(self):
+        self.player_database.save_player(self)
 
     def show_player_list(self):
         ''' Show a list of every player available '''

@@ -30,17 +30,17 @@ class View:
 
     def enter_tournament_info(self):
         tournament = {
-            "nom": input("Nom du tournois : "),
-            "lieu": input("Lieu du tournois : "),
-            "nombre_de_tour": input("Nombre de tour (par defaut : 4) : ") or "4",
+            "name": input("Nom du tournois : "),
+            "place": input("Lieu du tournois : "),
+            "round_number": input("Nombre de tour (par defaut : 4) : ") or "4",
             "description": input("Description : "),
         }
         print("type de controle du temps :")
         print("1 : Bullet")
         print("2 : Blitz")
         print("3 : Coup rapide")
-        tournament["controle_du_temps"] = self.ask_for_choice(3)
-        tournament["nombre_de_joueur"] = "8"
+        tournament["time_controle"] = self.ask_for_choice(3)
+        tournament["number_of_player"] = "8"
         return tournament
 
     def choice_player(self, player_list):
@@ -56,3 +56,8 @@ class View:
             else:
                 print("le choix entré ne corespond pas à un choix valide. choisisser à nouveau")
         return int(choice)
+
+    def choice_tournament(self, list_of_available_tounament):
+        for tournament in list_of_available_tounament:
+            print(tournament)
+        return self.ask_for_choice(len(list_of_available_tounament))

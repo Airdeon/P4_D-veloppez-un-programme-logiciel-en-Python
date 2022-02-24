@@ -1,5 +1,7 @@
+from asyncio.windows_events import NULL
 from datetime import datetime
 from tinydb import TinyDB, Query
+from player import Player
 
 
 class TournamentDataBase:
@@ -7,148 +9,69 @@ class TournamentDataBase:
         db = TinyDB('./db.json')
         self.tournament_table = db.table('tournaments')
 
-    def save_tournament(self, new=False):
+    def save_tournament(self, tournament_info, new=False):
         ''' Save tournament in database'''
-        player_id = ""
-        for player in self.joueurs:
-            player_id += str(player.id) + " "
-        tour_id = ""
-        for tour in self.tour:
-            tour_id += str(tour.id) + " "
-        serialized_tournament = {
-            'nom': self.nom,
-            'lieu': self.lieu,
-            'date_de_fin': str(self.date_de_fin),
-            'nombre_de_tour': self.nombre_de_tour,
-            'tour': tour_id,
-            'controle_du_temps': self.controle_du_temps,
-            'description': self.description,
-            'nombre_de_joueur': self.nombre_de_joueur,
-            'joueurs': player_id,
-        }
-        if new:
-            serialized_tournament["date_de_debut"] = datetime.now()
-            serialized_tournament["date_de_fin"] = ""
-            self.tournament_table.insert(serialized_tournament)
-        else:
-            self.tournament_table.update(set(self.id_tournament, serialized_tournament))
 
+        if new:
+            tournament_info["start_date"] = str(datetime.now())
+            tournament_info["end_date"] = ""
+            tournament_info['round_id'] = []
+            self.tournament_table.insert(tournament_info)
+            return self.tournament_table.count(all)
+        else:
+            self.tournament_table.update(set(self.id_tournament, tournament_info))
+
+    def available_tournament_list(self):
+        ''' get list of unfinished tournament from the database '''
+        tournament = Query()
+        tournament_line = self.tournament_table.search(tournament.date_de_fin == "")
+        tournament_list = []
+        tournament_count = 0
+        for tournament in tournament_line:
+            tournament_count += 1
+            tournament_list.append(str(tournament_count) + " : " + tournament['nom'])
+        return tournament_list
+
+    def get_tounament(self, tournament_choice):
+        tournament = Query()
+        tournament_line = self.tournament_table.search(tournament.date_de_fin == "")
+        tournament_info = tournament_line[int(tournament_choice)]
+        tournament_info['tournament_id'] = tournament_line[int(tournament_choice)].doc_id
+        return tournament_info
 
 
 class Tournament:
-    def __init__(self, new_tournament=False):
-        ''' Init tournament object with diferent method depend of Arguments
+    def __init__(self, tournament_info):
+        ''' Init tournament object with tournament info
 
             Args :
-                new_tournament : True for create a new tournament, False for find an existing one
+                tournament_info : all tournament data in list
         '''
-        if new_tournament == True:
-            self.new_tournaments()
-        else:
-            self.backup_tournament()
+        # Creation of tournament database object
+        self.tournament_database = TournamentDataBase()
+        # Tournament initialisation
+        self.tournament_id = tournament_info['tournament_id']
+        self.name = tournament_info['name']
+        self.place = tournament_info['place']
+        self.round_number = tournament_info['round_number']
+        self.description = tournament_info['description']
+        self.time_controle = tournament_info['time_controle']
+        self.number_of_player = tournament_info['number_of_player']
+        self.players = []
+        for player_id in tournament_info['player_id']:
+            player = Player(player_id)
+            self.players.append(player)
+        self.round = []
+        for round_id in tournament_info['round_id']:
+            round = Round(round_id)
+            self.round.append(round)
+        self.start_date = ['start_date']
+        self.end_date = ['end_date']
 
+    def save(self):
+        self.tournament_database.save_tournament(False)
 
-    def new_tournaments(self):
-        ''' Create a new tournament and save it in the database'''
-        self.nom = input("Nom du tournois : ")
-        self.lieu = input("Lieu du tournois : ")
-        self.date_de_debut = datetime.now()
-        self.date_de_fin = ""
-        self.nombre_de_tour = input("nombre de tour (par defaut : 4) : ") or "4"
-        self.tour = []
-        print("type de controle du temps :")
-        print("1 : Bullet")
-        print("2 : Blitz")
-        print("3 : Coup rapide")
-        good_choice = False
-        while good_choice == False:
-            choice = input("choix : ")
-            match choice:
-                case "1":
-                    good_choice = True
-                    self.controle_du_temps = "1"
-                case "2":
-                    good_choice = True
-                    self.controle_du_temps = "2"
-                case "3":
-                    good_choice = True
-                    self.controle_du_temps = "3"
-                case _:
-                    print("le choix entré ne corespond pas à un choix valide. choisisser à nouveau")
-        self.description = input("Description : ")
-        self.nombre_de_joueur = "8"
-        self.joueurs = self.get_players_choice()
-        self.id_tournament = self.tournament_table.count(all) + 1
-        self.save_tournament(True)
-
-
-    def get_players_choice(self):
-        ''' Choice every player who play in this tournament '''
-        players = []
-        for player_number in range(int(self.nombre_de_joueur)):
-            player = Player(False, players)
-            players.append(player)
-        return players
-
-    def backup_tournament(self):
-        ''' Reload an existing tournament from the database '''
-        tournament = Query()
-        tournament_line_serialized = self.tournament_table.search(tournament.date_de_fin == "")
-        backup_tournament_number = 0
-        for tournament in tournament_line_serialized:
-            backup_tournament_number += 1
-            print(str(backup_tournament_number) + " : " + tournament['nom'])
-
-        print("entrer le numero du tournois à continuer")
-        good_choice = False
-        while good_choice == False:
-            choice = input("choix : ")
-            if int(choice) > 0 and int(choice) <= backup_tournament_number:
-                good_choice=True
-                backup_tournament = tournament_line_serialized[int(choice)]
-                self.nom = backup_tournament['nom']
-                self.lieu = backup_tournament['lieu']
-                self.date_de_debut = backup_tournament['date_de_debut']
-                self.date_de_fin = backup_tournament['date_de_fin']
-                self.nombre_de_tour = backup_tournament['nombre_de_tour']
-                self.controle_du_temps = backup_tournament['controle_du_temps']
-                self.description = backup_tournament['description']
-                self.nombre_de_joueur = backup_tournament['nombre_de_joueur']
-                tour_id = backup_tournament['tour'].split()
-                player_id = backup_tournament['joueurs'].split()
-                self.players = []
-                for player in player_id:
-                    self.players.append(Player(player_id=int(player)))
-            else:
-                print("ce choix n'est pas valide !")
-
-    def save_tournament(self, new=False):
-        ''' Save tournament in database'''
-        player_id = ""
-        for player in self.joueurs:
-            player_id += str(player.id) + " "
-        tour_id = ""
-        for tour in self.tour:
-            tour_id += str(tour.id) + " "
-        serialized_tournament = {
-            'nom': self.nom,
-            'lieu': self.lieu,
-            'date_de_debut': str(self.date_de_debut),
-            'date_de_fin': str(self.date_de_fin),
-            'nombre_de_tour': self.nombre_de_tour,
-            'tour': tour_id,
-            'controle_du_temps': self.controle_du_temps,
-            'description': self.description,
-            'nombre_de_joueur': self.nombre_de_joueur,
-            'joueurs': player_id,
-        }
-        if new:
-            self.tournament_table.insert(serialized_tournament)
-        else:
-            self.tournament_table.update(set(self.id_tournament, serialized_tournament))
-
-
-class Tours:
+class Round:
     def __init__(self, nombre_de_match):
         self.nombre_de_match = nombre_de_match
         self.datetime_debut = datetime.now()
