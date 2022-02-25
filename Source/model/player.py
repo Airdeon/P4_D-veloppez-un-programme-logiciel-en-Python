@@ -28,7 +28,7 @@ class PlayerDataBase:
         total_number_of_player = self.players_table.count(all)
         for index_player in range(1, total_number_of_player+1):
             player_line_serialized = self.players_table.get(all, index_player)
-            player_line = str(index_player) + " " + player_line_serialized['nom'] + " " + player_line_serialized['prenom']
+            player_line = str(index_player) + " " + player_line_serialized['lastname'] + " " + player_line_serialized['firstname']
             if index_player not in players_already_pick:
                 valid_players_id.append(index_player)
                 valid_players_string += player_line + "\n"
@@ -58,44 +58,16 @@ class Player:
         # creation of database object
         self.player_database = PlayerDataBase()
         # player initialisation
-        player_serialized = PlayerDataBase.get_player_from_database(player_id)
+        player_serialized = self.player_database.get_player_from_database(int(player_id))
         self.lastname = player_serialized['lastname']
         self.firstname = player_serialized['firstname']
         self.birthday = player_serialized['birthday']
         self.sex = player_serialized['sex']
         self.ranking = player_serialized['ranking']
         self.player_id = player_id
-    
+
+    def __str__(self):
+        return "".join(self.lastname + " " + self.firstname + " : " + self.ranking)
+
     def save(self):
         self.player_database.save_player(self)
-
-    def show_player_list(self):
-        ''' Show a list of every player available '''
-        valid_players=[]
-        total_number_of_player = self.players_table.count(all)
-        for number_of_player in range(total_number_of_player):
-            player_line_serialized = self.players_table.get(all, number_of_player+1)
-            player_line = str(number_of_player+1) + " " + player_line_serialized['nom'] + " " + player_line_serialized['prenom']
-            valid = True
-            for player in self.players_already_pick:
-                if player.id == (number_of_player + 1):
-                    valid = False
-                    break
-            if valid == True:
-                valid_players.append(number_of_player+1)
-                print(player_line)
-        print("entrer le numero du joueur à ajouter")
-        good_choice = False
-        while good_choice == False:
-            choice = input("choix : ")
-            if int(choice) in valid_players:
-                good_choice=True
-                player_select = self.players_table.get(all, int(choice))
-                self.nom = player_select['nom']
-                self.prenom = player_select['prenom']
-                self.date_de_naissance = player_select['date_de_naissance']
-                self.sexe = player_select['sexe']
-                self.classement = player_select['classement']
-                self.id = int(choice)
-            else:
-                print("ce choix n'est pas valide !")

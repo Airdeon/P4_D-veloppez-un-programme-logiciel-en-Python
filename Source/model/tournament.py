@@ -1,7 +1,7 @@
 from asyncio.windows_events import NULL
 from datetime import datetime
 from tinydb import TinyDB, Query
-from player import Player
+from .player import Player
 
 
 class TournamentDataBase:
@@ -24,19 +24,19 @@ class TournamentDataBase:
     def available_tournament_list(self):
         ''' get list of unfinished tournament from the database '''
         tournament = Query()
-        tournament_line = self.tournament_table.search(tournament.date_de_fin == "")
+        tournament_line = self.tournament_table.search(tournament.end_date == "")
         tournament_list = []
         tournament_count = 0
         for tournament in tournament_line:
             tournament_count += 1
-            tournament_list.append(str(tournament_count) + " : " + tournament['nom'])
+            tournament_list.append(str(tournament_count) + " : " + tournament['name'])
         return tournament_list
 
     def get_tounament(self, tournament_choice):
         tournament = Query()
-        tournament_line = self.tournament_table.search(tournament.date_de_fin == "")
-        tournament_info = tournament_line[int(tournament_choice)]
-        tournament_info['tournament_id'] = tournament_line[int(tournament_choice)].doc_id
+        tournament_line = self.tournament_table.search(tournament.end_date == "")
+        tournament_info = tournament_line[int(tournament_choice)-1]
+        tournament_info['tournament_id'] = tournament_line[int(tournament_choice)-1].doc_id
         return tournament_info
 
 
@@ -71,17 +71,26 @@ class Tournament:
     def save(self):
         self.tournament_database.save_tournament(False)
 
-class Round:
-    def __init__(self, nombre_de_match):
-        self.nombre_de_match = nombre_de_match
-        self.datetime_debut = datetime.now()
 
+class Round:
+    def __init__(self, tournament):
+        self.match = []
+        self.tournament = tournament
+        if len(tournament.round) == 0:
+            sorted_player = self.sorted_by_ranking()
+            for player in len(sorted_player) / 2:
+                self.match.append(Match(sorted_player[player], sorted_player[-player]))
+
+
+    def sorted_by_ranking(self):
+        sorted_player = sorted(self.tournament.players, key=lambda player: player.ranking, reverse=True)
+        return sorted_player
 
 
 class Match:
-    def __init__(self, id_joueur1, id_joueur2):
-        self.id_joueur1 = id_joueur1
-        self.id_joueur2 = id_joueur2
+    def __init__(self, player1, player2):
+        self.player1 = player1
+        self.player2 = player2
 
     def register_result():
         pass
