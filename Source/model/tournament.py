@@ -1,4 +1,3 @@
-from asyncio.windows_events import NULL
 from datetime import datetime
 from tinydb import TinyDB, Query
 from .player import Player
