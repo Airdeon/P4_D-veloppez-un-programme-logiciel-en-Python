@@ -7,6 +7,17 @@ class View:
         print("4 : quiter le programme")
         print("\nentré le nombre correspondant a votre choix.")
         return self.ask_for_choice(4)
+    
+    def show_tournament_menu(self, etat):
+        print("\n\n## Menu du tournois ##\n")
+        if etat:
+            print("1 : commencer le prochain tour")
+        else :
+            print("1 : commencer le tournois")
+        print("2 : voir la liste des joueurs du tournois")
+        print("3 : quitter le tournois")
+        print("\nentré le nombre correspondant a votre choix.")
+        return self.ask_for_choice(3)
 
     def ask_for_choice(self, number_of_choices):
         good_choice = False
