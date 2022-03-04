@@ -54,7 +54,8 @@ class Controller:
         else:
             self.round.start_round()
             self.tournament.round.append(self.round.save_round())
-        self.tournament.round.append(round)
+        self.tournament.save()
+
         print(self.tournament.round)
 
     def run_tournament(self):

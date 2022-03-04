@@ -1,5 +1,5 @@
 from datetime import datetime
-from tinydb import TinyDB, Query
+from tinydb import TinyDB, Query, where
 from .player import Player
 
 
@@ -18,8 +18,7 @@ class TournamentDataBase:
             self.tournament_table.insert(tournament_info)
             return self.tournament_table.count(all)
         else:
-            # a faire : tournament info serialisé
-            self.tournament_table.update(set(self.id_tournament, tournament_info))
+            self.tournament_table.update({'round_id': tournament_info.round_id}, doc_ids=[tournament_info.tournament_id])
 
     def available_tournament_list(self):
         """get list of unfinished tournament from the database"""
@@ -61,10 +60,7 @@ class Tournament:
         for player_id in tournament_info["player_id"]:
             player = Player(player_id)
             self.players.append(player)
-        self.round = []
-        for round_id in tournament_info["round_id"]:
-            round = Round(round_id)
-            self.round.append(round)
+        self.round_id = tournament_info["round_id"]
         self.start_date = ["start_date"]
         self.end_date = ["end_date"]
 
@@ -75,7 +71,7 @@ class RoundDataBase:
     def __init__(self, tournament):
         db = TinyDB("./db.json")
         self.round_table = db.table("round")
-    
+
     def save_new_round(self):
         round_info = []
         round_info['match'] = self.match
@@ -90,16 +86,17 @@ class Round:
         self.tournament = tournament
         self.half_of_player = int(int(self.tournament.number_of_player) / 2)
 
-    def first_round(self)
+    def first_round(self):
         sorted_player = self.sorted_by_ranking()
         for player in range(self.half_of_player):
-            self.match.append(Match(sorted_player[player], sorted_player[player + self.half_of_player]))
+            new_match = MatchDatabase()
+            self.match.append(new_match.save_new_match(sorted_player[player], sorted_player[player + self.half_of_player]))
 
     def start_round(self):
         pass
 
     def save_round(self):
-        round_info = []
+        round_info = {}
         round_info['match'] = self.match
         self.round_table.insert(round_info)
         return self.round_table.count(all)
@@ -108,30 +105,50 @@ class Round:
         sorted_player = sorted(self.tournament.players, key=lambda player: player.ranking, reverse=True)
         return sorted_player
 
-
-class Match:
-    def __init__(self, player1, player2):
+class MatchDatabase:
+    def __init__(self):
         # Database
         db = TinyDB("./db.json")
         self.match_table = db.table("match")
-        # init player
-        self.player1 = player1
-        self.player2 = player2
-        self.player1_score = 0
-        self.player2_score = 0
-        self.match_id = self.save_new_match()
-    
-    def save_new_match(self):
-        match_info = []
-        match_info['player1'] = self.player1.player_id
-        match_info['player2'] = self.player2.player_id
+
+    def save_new_match(self, player1, player2):
+        match_info = {}
+        match_info['player1'] = player1.player_id
+        match_info['player2'] = player2.player_id
         match_info['player1_score'] = 0
         match_info['player2_score'] = 0
         self.match_table.insert(match_info)
         return self.match_table.count(all)
-    
+
+    def get_match_by_id(self, match_id):
+        ''' Get a match by id from database
+
+            Args:
+                match_id : id of the match in database
+        '''
+        match_information = self.match_table.get(all, match_id)
+        return match_information
+
     def update_score(self, match_id, score_player1, score_player2):
-        self.match_table.update(set(self.match_id, match_info))
+        match_info = []
+        match_info['player1_score'] = score_player1
+        match_info['player2_score'] = score_player2
+        self.match_table.update(set(match_id, match_info))
+
+
+class Match:
+    def __init__(self, match_id):
+        # Database
+        db = TinyDB("./db.json")
+        self.match_table = db.table("match")
+        self.match_database = MatchDatabase()
+        # init match
+        match_serialized = self.match_database.get_match_by_id(int(match_id))
+        self.player1 = match_serialized['player1']
+        self.player2 = match_serialized['player2']
+        self.player1_score = match_serialized['player1_score']
+        self.player2_score = match_serialized['player2_score']
+        self.match_id = match_id
 
     def register_result():
         pass

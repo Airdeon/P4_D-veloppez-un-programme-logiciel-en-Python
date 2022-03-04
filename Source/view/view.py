@@ -12,7 +12,7 @@ class View:
         print("\n\n## Menu du tournois ##\n")
         if etat:
             print("1 : commencer le prochain tour")
-        else :
+        else:
             print("1 : commencer le tournois")
         print("2 : voir la liste des joueurs du tournois")
         print("3 : quitter le tournois")
@@ -72,3 +72,6 @@ class View:
         for tournament in list_of_available_tounament:
             print(tournament)
         return self.ask_for_choice(len(list_of_available_tounament))
+
+    def show_match_info(player1, player2):
+        print(player1.firstname + ' ' + player1.lastname + ' VS ' + player2.firstname + ' ' + player2.lastname)
