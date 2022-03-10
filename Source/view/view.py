@@ -8,14 +8,16 @@ class View:
         print("\nentré le nombre correspondant a votre choix.")
         return self.ask_for_choice(4)
 
-    def show_tournament_menu(self, etat):
+    def show_tournament_menu(self, round_status, etat):
         print("\n\n## Menu du tournois ##\n")
-        if etat == "first_round":
-            print("1 : commencer le tournois")
+        if round_status == "started":
+            print("1 : Finir le tour")
+        elif etat == "first_round":
+            print("1 : Commencer le tournois")
         elif etat == "new_round":
-            print("1 : commencer le prochain tour")
-        elif etat == "finish":
-            print("1 : terminer le tournois")
+            print("1 : Commencer le prochain tour")
+        elif etat == "finish" and round_status == "":
+            print("1 : Voir les scores")
         print("2 : voir la liste des joueurs du tournois")
         print("3 : quitter le tournois")
         print("\nentré le nombre correspondant a votre choix.")
@@ -92,11 +94,49 @@ class View:
             + " "
             + match.player2.ranking
         )
+        input("\nAppuyer sur ENTER pour continuer !\n")
     
     def enter_score_choice(self, match):
         print("\nchoisisez le score pour le match entre :\n")
         self.show_match_info(match)
-        print("1 : victoire de " + match.player1.firstname + ' ' + match.player1.lastname)
+        print("1 : Victoire de " + match.player1.firstname + ' ' + match.player1.lastname)
         print("2 : Match Nul")
-        print("3 : victoire de " + match.player2.firstname + ' ' + match.player2.lastname)
+        print("3 : Victoire de " + match.player2.firstname + ' ' + match.player2.lastname)
         return self.ask_for_choice(3)
+    
+    def show_score(self, sorted_list_player_by_score):
+        ''' Show the scoreboard of the tournament
+        
+            attr:
+                sorted_list_player_by_score : sorted list of player order by score descendant
+        '''
+        tournament_ranking = 1
+        for player in sorted_list_player_by_score:
+            print(
+                str(tournament_ranking)
+                + ' : ' +
+                player[0].firstname
+                + ' ' +
+                player[0].lastname
+                + ' : ' +
+                str(player[1])
+            )
+            tournament_ranking += 1
+        input("\nAppuyer sur ENTER pour continuer !\n")
+    
+    def show_player_list(self, player_list):
+        ''' Show basic player info from the player list given
+        
+            attr:
+                player_list : list of players to show
+        '''
+        for player in player_list:
+            print(
+                player.ranking
+                + ' : ' +
+                player.firstname
+                + ' ' +
+                player.lastname
+            )
+        input("\nAppuyer sur ENTER pour continuer !\n")
+

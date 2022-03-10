@@ -7,6 +7,7 @@ class Controller:
     def __init__(self):
         self.players = []
         self.view = View()
+        self.round_status = ""
         self.players_data_base = PlayerDataBase()
         self.tournament_data_base = TournamentDataBase()
 
@@ -45,10 +46,13 @@ class Controller:
 
     def launch_round(self):
         self.tournament.rounds.append(Round(self.tournament))
+        self.round_status = "started"
         self.tournament.update()
         print(self.tournament.rounds)
         for match in self.tournament.rounds[-1].matchs:
             self.view.show_match_info(match)
+
+    def define_score(self):
         for match in self.tournament.rounds[-1].matchs:
             choice = self.view.enter_score_choice(match)
             match choice:
@@ -60,26 +64,25 @@ class Controller:
                 case "3":
                     match.player2_score = 1
             match.save_match_result()
-
+            self.round_status = ""
 
     def run_tournament(self):
         end_loop = False
         while not end_loop:
-            if len(self.tournament.rounds) == 0:
-                tournament_status = "first_round"
-            elif len(self.tournament.rounds) > 0 and len(self.tournament.rounds) < int(self.tournament.number_of_round):
-                tournament_status = "new_round"
+            if len(self.tournament.rounds) < int(self.tournament.number_of_round):
+                tournament_status = "round"
             else:
                 tournament_status = "finish"
             
-            choice = self.view.show_tournament_menu(tournament_status)
+            choice = self.view.show_tournament_menu(self.round_status, tournament_status)
             match choice:
                 case "1":
-                    if tournament_status == "first_round" or tournament_status == "new_round":
+                    if self.round_status == "starded":
+                        self.define_score()
+                    elif tournament_status == "round":
                         self.launch_round()
-                    elif tournament_status == "finish":
-                        pass
-
+                    elif tournament_status == "finish" and self.round_status == "":
+                        self.view.show_score(self.tournament.get_score())
                 case "2":
                     pass
                 case "3":

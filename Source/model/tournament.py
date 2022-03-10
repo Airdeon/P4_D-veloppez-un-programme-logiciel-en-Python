@@ -1,4 +1,5 @@
 from datetime import datetime
+from tabnanny import check
 from tinydb import TinyDB, Query, where
 from .player import Player
 
@@ -68,6 +69,24 @@ class Tournament:
             "end_date": self.end_date,
             },
             doc_ids=[self.tournament_id])
+    
+    def get_score(self):
+        player_score = {}
+        for round in self.rounds:
+            for match in round.matchs:
+                for player in self.players:
+                    if player.player_id == match.player1.player_id:
+                        if player in player_score:
+                            player_score[player] += match.player1_score
+                        else:
+                            player_score[player] = match.player1_score
+                    elif player.player_id == match.player2.player_id:
+                        if player in player_score:
+                            player_score[player] += match.player2_score
+                        else:
+                            player_score[player] = match.player2_score
+
+        return sorted(player_score.items(), key=lambda x: (x[1], x[0].ranking), reverse=True)
 
 
 class Round:
@@ -106,7 +125,37 @@ class Round:
 
     def start_round(self):
         sorted_player = self.sorted_by_score()
-        pass
+        sorted_player_left = []
+        for player in sorted_player:
+            sorted_player_left.append(player[0])
+        for player in range(self.half_of_player):
+            print("test player number : " + str(player))
+            print(sorted_player_left)
+            player1 = sorted_player_left[0]
+            del sorted_player_left[0]
+            not_meet_player = self.check_previous_match(player1, sorted_player_left)
+            player2 = not_meet_player[0]
+            del sorted_player_left[not_meet_player[1]]
+            self.matchs.append(Match(player1=player1, player2=player2))
+
+    def check_previous_match(self, player1, sorted_player_left):
+        player_index = 0
+        meet = False
+        for playerleft in sorted_player_left:
+            print(player1.firstname )
+            print(playerleft.firstname)
+            for round in self.tournament.rounds:
+                for match in round.matchs:
+                    if player1.player_id == match.player1.player_id and playerleft.player_id == match.player2.player_id:
+                        print(player1.firstname + ' a deja rencontrer ' + playerleft.firstname)
+                        meet = True
+                    elif player1.player_id == match.player2.player_id and playerleft.player_id == match.player1.player_id:
+                        print(player1.firstname + ' a deja rencontrer ' + playerleft.firstname)
+                        meet = True
+            if meet == False:
+                return [playerleft, player_index]
+            player_index +=1
+        return [sorted_player_left[0], 0]
 
     def sorted_by_ranking(self):
         sorted_players = sorted(self.tournament.players, key=lambda player: player.ranking, reverse=True)
@@ -117,20 +166,18 @@ class Round:
         for round in self.tournament.rounds:
             for match in round.matchs:
                 for player in self.tournament.players:
-                    if player == match.player1:
+                    if player.player_id == match.player1.player_id:
                         if player in player_score:
                             player_score[player] += match.player1_score
                         else:
                             player_score[player] = match.player1_score
-                    elif player == match.player2:
+                    elif player.player_id == match.player2.player_id:
                         if player in player_score:
                             player_score[player] += match.player2_score
                         else:
                             player_score[player] = match.player2_score
 
-        sorted_player = sorted(player_score, key=lambda player: player[1])
-        print("test")
-        print(sorted_player)
+        return sorted(player_score.items(), key=lambda x: (x[1], x[0].ranking), reverse=True)
 
 
 class Match:
