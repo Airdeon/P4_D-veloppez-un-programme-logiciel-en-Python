@@ -1,7 +1,6 @@
-import numbers
 from view.view import View
 from model.player import Player, PlayerDataBase
-from model.tournament import Tournament, TournamentDataBase, Round
+from model.tournament import Tournament, TournamentDataBase, Round, Match
 
 
 class Controller:
@@ -32,43 +31,55 @@ class Controller:
         players = []
         for player in range(int(tournament_info["number_of_player"])):
             players.append(self.view.choice_player(self.players_data_base.get_player_available_list(players)))
-        tournament_info["player_id"] = players
-        tournament_info["tournament_id"] = self.tournament_data_base.save_tournament(tournament_info, True)
-        self.tournament = Tournament(tournament_info)
+        tournament_info["players"] = players
+        tournament_info["rounds"] = []
+        self.tournament = Tournament(tournament_info=tournament_info)
         self.run_tournament()
 
     def backup_tournament(self):
         """get back an existing tournament from the database"""
-        tournament_info = self.tournament_data_base.get_tounament(
-            self.view.choice_tournament(self.tournament_data_base.available_tournament_list())
-        )
-        self.tournament = Tournament(tournament_info)
+        tournament_available_list = self.tournament_data_base.available_tournament_list()
+        tournament_choice = int(self.view.choice_tournament(tournament_available_list)) - 1
+        self.tournament = Tournament(tournament_id=int(tournament_available_list[tournament_choice].doc_id))
         self.run_tournament()
 
-    def launch_round(self, tournament_status):
-        self.round = Round(self.tournament)
-        if not tournament_status:
-            self.round.first_round()
-            self.tournament.round.append(self.round.save_round())
+    def launch_round(self):
+        self.tournament.rounds.append(Round(self.tournament))
+        self.tournament.update()
+        print(self.tournament.rounds)
+        for match in self.tournament.rounds[-1].matchs:
+            self.view.show_match_info(match)
+        for match in self.tournament.rounds[-1].matchs:
+            choice = self.view.enter_score_choice(match)
+            match choice:
+                case "1":
+                    match.player1_score = 1
+                case "2":
+                    match.player1_score = 0.5
+                    match.player2_score = 0.5
+                case "3":
+                    match.player2_score = 1
+            match.save_match_result()
 
-        else:
-            self.round.start_round()
-            self.tournament.round.append(self.round.save_round())
-        self.tournament.save()
-
-        print(self.tournament.round)
 
     def run_tournament(self):
         end_loop = False
         while not end_loop:
-            if len(self.tournament.round) == 0:
-                tournament_status = False
+            if len(self.tournament.rounds) == 0:
+                tournament_status = "first_round"
+            elif len(self.tournament.rounds) > 0 and len(self.tournament.rounds) < int(self.tournament.number_of_round):
+                tournament_status = "new_round"
             else:
-                tournament_status = True
+                tournament_status = "finish"
+            
             choice = self.view.show_tournament_menu(tournament_status)
             match choice:
                 case "1":
-                    self.launch_round(tournament_status)
+                    if tournament_status == "first_round" or tournament_status == "new_round":
+                        self.launch_round()
+                    elif tournament_status == "finish":
+                        pass
+
                 case "2":
                     pass
                 case "3":

@@ -7,13 +7,15 @@ class View:
         print("4 : quiter le programme")
         print("\nentré le nombre correspondant a votre choix.")
         return self.ask_for_choice(4)
-    
+
     def show_tournament_menu(self, etat):
         print("\n\n## Menu du tournois ##\n")
-        if etat:
-            print("1 : commencer le prochain tour")
-        else:
+        if etat == "first_round":
             print("1 : commencer le tournois")
+        elif etat == "new_round":
+            print("1 : commencer le prochain tour")
+        elif etat == "finish":
+            print("1 : terminer le tournois")
         print("2 : voir la liste des joueurs du tournois")
         print("3 : quitter le tournois")
         print("\nentré le nombre correspondant a votre choix.")
@@ -43,7 +45,7 @@ class View:
         tournament = {
             "name": input("Nom du tournois : "),
             "place": input("Lieu du tournois : "),
-            "round_number": input("Nombre de tour (par defaut : 4) : ") or "4",
+            "number_of_round": input("Nombre de tour (par defaut : 4) : ") or "4",
             "description": input("Description : "),
         }
         print("type de controle du temps :")
@@ -69,9 +71,32 @@ class View:
         return int(choice)
 
     def choice_tournament(self, list_of_available_tounament):
+        tournament_number = 1
+        print(list_of_available_tounament)
         for tournament in list_of_available_tounament:
-            print(tournament)
+            print(str(tournament_number) + ' : ' + tournament['name'])
+            tournament_number +=1
         return self.ask_for_choice(len(list_of_available_tounament))
 
-    def show_match_info(player1, player2):
-        print(player1.firstname + ' ' + player1.lastname + ' VS ' + player2.firstname + ' ' + player2.lastname)
+    def show_match_info(self, match):
+        print(
+            match.player1.ranking
+            + " "
+            + match.player1.firstname
+            + " "
+            + match.player1.lastname
+            + " -- VS -- "
+            + match.player2.firstname
+            + " "
+            + match.player2.lastname
+            + " "
+            + match.player2.ranking
+        )
+    
+    def enter_score_choice(self, match):
+        print("\nchoisisez le score pour le match entre :\n")
+        self.show_match_info(match)
+        print("1 : victoire de " + match.player1.firstname + ' ' + match.player1.lastname)
+        print("2 : Match Nul")
+        print("3 : victoire de " + match.player2.firstname + ' ' + match.player2.lastname)
+        return self.ask_for_choice(3)

@@ -67,7 +67,7 @@ class Player:
         self.player_id = player_id
 
     def __str__(self):
-        return "".join(self.lastname + " " + self.firstname + " : " + self.ranking)
+        return self.player_id
 
     def save(self):
         self.player_database.save_player(self)
