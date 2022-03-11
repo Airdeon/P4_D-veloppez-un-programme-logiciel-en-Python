@@ -6,6 +6,9 @@ class PlayerDataBase:
         db = TinyDB('./db.json')
         self.players_table = db.table('players')
 
+    def get_number_of_player(self):
+        return self.players_table.count(all)
+
     def get_player_available_list(self, players_already_pick):
         ''' get a list of every player available '''
         valid_players_id = []

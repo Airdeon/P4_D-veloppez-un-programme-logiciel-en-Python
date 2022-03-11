@@ -1,3 +1,2 @@
-- finir la recupération de tournois
-- codé la class Tour
-- codé la class Match
+- Ajouter la liste des tournois
+- Ajouter la possibiliter de modifier les info du joueur, principalement le ranking

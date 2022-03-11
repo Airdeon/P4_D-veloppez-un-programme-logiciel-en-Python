@@ -32,9 +32,15 @@ class Controller:
             choice = self.view.show_tournament_menu()
             match choice:
                 case "1":
-                    self.create_tournament()
+                    if self.players_data_base.get_number_of_player < 8:
+                        self.view.show_number_of_player_warning()
+                    else:
+                        self.create_tournament()
                 case "2":
-                    self.backup_tournament()
+                    if len(self.tournament_data_base.available_tournament_list()) == 0:
+                        self.view.show_number_of_tournament_warning()
+                    else:
+                        self.backup_tournament()
                 case "3":
                     pass
                 case "4":
@@ -73,12 +79,12 @@ class Controller:
 
     def launch_round(self):
         self.tournament.rounds.append(Round(self.tournament))
-        self.round_status = "started"
         self.tournament.update()
         for match in self.tournament.rounds[-1].matchs:
             self.view.show_match_info(match)
 
     def define_score(self):
+        print(self.tournament.rounds)
         for match in self.tournament.rounds[-1].matchs:
             choice = self.view.enter_score_choice(match)
             match choice:
@@ -93,7 +99,7 @@ class Controller:
             self.tournament.rounds[-1].update_end_datetime()
             if int(self.tournament.number_of_round) == len(self.tournament.rounds):
                 self.tournament.finish_tournament()
-            self.round_status = ""
+            self.tournament.rounds[-1].round_status = ""
 
     def run_tournament(self):
         end_loop = False
@@ -103,16 +109,17 @@ class Controller:
             else:
                 tournament_status = "finish"
 
-            choice = self.view.show_selected_tournament_menu(self.tournament.name, self.round_status, tournament_status)
+            choice = self.view.show_selected_tournament_menu(self.tournament.name, self.tournament.rounds[-1].end_datetime, tournament_status)
             match choice:
                 case "1":
-                    if self.round_status == "starded":
+                    print(self.round_status)
+                    if self.tournament.rounds[-1].end_datetime == "":
                         self.define_score()
                     elif tournament_status == "round":
                         self.launch_round()
                     elif tournament_status == "finish" and self.round_status == "":
                         self.view.show_score(self.tournament.get_score())
                 case "2":
-                    pass
+                    self.view.show_player_list(self.tournament.players)
                 case "3":
                     end_loop = True

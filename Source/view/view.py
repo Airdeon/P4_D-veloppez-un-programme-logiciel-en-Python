@@ -35,16 +35,27 @@ class View:
     def show_selected_tournament_menu(self, tournament_name, round_status, etat):
         #clean_screen()
         print("## Menu du tournois : " + tournament_name + " ##\n")
-        if round_status == "started":
+        if round_status == "":
             print("1 : Finir le tour")
         elif etat == "round":
             print("1 : Commencer le prochain tour")
-        elif etat == "finish" and round_status == "":
+        elif etat == "finish" and round_status != "":
             print("1 : Voir les scores")
         print("2 : Voir la liste des joueurs du tournois")
         print("3 : Quitter le tournois")
         print("\nentré le nombre correspondant a votre choix.")
         return self.ask_for_choice(3)
+
+    def show_number_of_player_warning(self):
+        clean_screen()
+        print("Le nombre de joueur dans la base de donnée est inssufisante pour lancer un tournois (Minimum 8)")
+        print("Ajouter plus de joueurs depuis le menu de gestion des joueurs")
+        input("\nAppuyer sur ENTER pour continuer !\n")
+
+    def show_number_of_tournament_warning(self):
+        clean_screen()
+        print("Il n'y a pas de tournois a terminer actuellement !")
+        input("\nAppuyer sur ENTER pour continuer !\n")
 
     def ask_for_choice(self, number_of_choices):
         good_choice = False
