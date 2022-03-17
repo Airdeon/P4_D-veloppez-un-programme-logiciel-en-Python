@@ -66,3 +66,7 @@ class Player:
 
     def __str__(self):
         return self.player_id
+
+    def update_ranking(self, new_ranking):
+        self.ranking = new_ranking
+        self.players_table.update({"ranking": self.ranking}, doc_ids=[self.player_id])

@@ -9,11 +9,20 @@ class TournamentDataBase:
         db = TinyDB("./db.json")
         self.tournament_table = db.table("tournaments")
 
-    def available_tournament_list(self):
+    def get_available_tournament_list(self):
         """get list of unfinished tournament from the database"""
         tournament = Query()
         tournament_line = self.tournament_table.search(tournament.end_date == "")
-        return tournament_line
+        tournament_list = []
+        for tournament in tournament_line:
+            tournament_list.append(Tournament(tournament_id=tournament.doc_id))
+        return tournament_list
+
+    def get_tournament_list(self):
+        tournament_list = []
+        for tournament in self.tournament_table:
+            tournament_list.append(Tournament(tournament_id=tournament.doc_id))
+        return tournament_list
 
 
 class Tournament:

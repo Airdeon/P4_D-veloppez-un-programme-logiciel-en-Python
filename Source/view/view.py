@@ -11,8 +11,8 @@ class View:
         print("## Menu Principale ##\n")
         print("1 : Tournois")
         print("2 : Gestion des joueurs")
-        print("3 : Quiter le programme")
-        print("\nentré le nombre correspondant a votre choix.")
+        print("3 : Quitter le programme")
+        print("\nEntré le nombre correspondant a votre choix.")
         return self.ask_for_choice(3)
 
     def show_tournament_menu(self):
@@ -64,7 +64,7 @@ class View:
             if choice.isdigit() and int(choice) > 0 and int(choice) <= number_of_choices:
                 good_choice = True
             else:
-                print("le choix entré ne corespond pas à un choix valide. choisisser à nouveau")
+                print("Le choix entré ne corespond pas à un choix valide. choisisser à nouveau")
         return choice
 
     def enter_player_info(self):
@@ -75,7 +75,15 @@ class View:
         player["firstname"] = input("prenom : ")
         player["birthday"] = input("date de naissance : ")
         player["sex"] = input("sexe : ")
-        player["ranking"] = input("classement : ")
+        good_value = False
+        while not good_value:
+            response = input("Classement : ")
+            try:
+                ranking = int(response)
+                good_value = True
+            except ValueError:
+                print("\nLa valeur entré n'est pas valide, entrer un nombre entier")
+        player["ranking"] = ranking
         print("\nJoueur sauvegarder !")
         input("\nAppuyer sur ENTER pour continuer !\n")
         return player
@@ -180,10 +188,52 @@ class View:
             print(
                 str(player.player_id)
                 + ' : ' +
-                player.ranking
+                str(player.ranking)
                 + ' : ' +
                 player.firstname
                 + ' ' +
                 player.lastname
             )
-        input("\nAppuyer sur ENTER pour continuer !\n")
+        print("\nPour modifier le classement d'un joueur, entrer son numero, si non, appuyer sur ENTER pour revenir au menu !\n")
+        choice = input("choix :")
+        for player in player_list:
+            if str(player.player_id) == choice:
+                return player
+        return ""
+
+    def change_player_ranking(self, player):
+        print("\nle classement actuelle de " + player.firstname + " " + player.lastname + " est : " + str(player.ranking))
+        good_value = False
+        while not good_value:
+            response = input("enter son nouveau classement : ")
+            try:
+                ranking = int(response)
+                good_value = True
+            except ValueError:
+                print("\nLa valeur entré n'est pas valide, entrer un nombre entier")
+
+        print("nouveau classement enregistré")
+        return ranking
+
+    def show_tournament_list(self, tournament_list):
+        clean_screen()
+        print("## Liste des Tournois ##\n")
+        for tournament in tournament_list:
+            tournament_line = "".join(
+                str(tournament.tournament_id)
+                + ' : ' +
+                tournament.name
+                + ' à ' +
+                tournament.place
+                + ' | Démaré le ' +
+                tournament.start_date[0:19]
+                )
+            if tournament.end_date != "":
+                tournament_line.join(" et terminé le " + tournament.end_date[0:19])
+            print(tournament_line)
+        print("\nPour entrer dans un tournois, entrer son numero id, si non, appuyer sur ENTER pour revenir au menu !\n")
+        choice = input("choix : ")
+        for tournament in tournament_list:
+            if str(tournament.tournament_id) == choice:
+                return tournament
+        return ""

@@ -42,7 +42,10 @@ class Controller:
                     else:
                         self.backup_tournament()
                 case "3":
-                    pass
+                    tournament_choice = self.view.show_tournament_list(self.tournament_data_base.get_tournament_list())
+                    if tournament_choice != "":
+                        self.tournament = tournament_choice
+                        self.run_tournament()
                 case "4":
                     end_loop = True
 
@@ -53,7 +56,9 @@ class Controller:
             choice = self.view.show_player_management_menu()
             match choice:
                 case "1":
-                    self.view.show_player_list(self.players_data_base.get_player_list())
+                    playerchoice = self.view.show_player_list(self.players_data_base.get_player_list())
+                    if playerchoice != "":
+                        playerchoice.update_ranking(self.view.change_player_ranking(playerchoice))
                 case "2":
                     Player(player_info=self.view.enter_player_info())
                 case "3":
@@ -72,10 +77,10 @@ class Controller:
 
     def backup_tournament(self):
         """get back an existing tournament from the database"""
-        tournament_available_list = self.tournament_data_base.available_tournament_list()
-        tournament_choice = int(self.view.choice_tournament(tournament_available_list)) - 1
-        self.tournament = Tournament(tournament_id=int(tournament_available_list[tournament_choice].doc_id))
-        self.run_tournament()
+        tournament_choice = self.view.show_tournament_list(self.tournament_data_base.get_available_tournament_list())
+        if tournament_choice != "":
+            self.tournament = tournament_choice
+            self.run_tournament()
 
     def launch_round(self):
         self.tournament.rounds.append(Round(self.tournament))
@@ -120,6 +125,8 @@ class Controller:
                     elif tournament_status == "finish" and self.round_status == "":
                         self.view.show_score(self.tournament.get_score())
                 case "2":
-                    self.view.show_player_list(self.tournament.players)
+                    playerchoice = self.view.show_player_list(self.tournament.players)
+                    if playerchoice != "":
+                        playerchoice.update_ranking(self.view.change_player_ranking(playerchoice))
                 case "3":
                     end_loop = True
