@@ -32,17 +32,21 @@ class View:
         print("3 : Retour au menu principale")
         return self.ask_for_choice(3)
 
-    def show_selected_tournament_menu(self, tournament_name, round_status, etat):
-        #clean_screen()
-        print("## Menu du tournois : " + tournament_name + " ##\n")
-        if round_status == "":
+    def show_selected_tournament_menu(self, tournament_name, tournament_status):
+        print("\n## Menu du tournois : " + tournament_name + " ##\n")
+        if tournament_status == "enter_score":
             print("1 : Finir le tour")
-        elif etat == "round":
+        elif tournament_status == "not_started":
+            print("1 : Commencer le premier tour")
+        elif tournament_status == "start_new_round":
             print("1 : Commencer le prochain tour")
-        elif etat == "finish" and round_status != "":
+        elif tournament_status == "finish":
             print("1 : Voir les scores")
-        print("2 : Voir la liste des joueurs du tournois")
-        print("3 : Quitter le tournois")
+        if tournament_status != "finish":
+            print("2 : Voir le classement actuelle")
+            print("3 : Quitter le tournois")
+        else:
+            print("2 : Quitter le tournois")
         print("\nentré le nombre correspondant a votre choix.")
         return self.ask_for_choice(3)
 
@@ -65,6 +69,7 @@ class View:
                 good_choice = True
             else:
                 print("Le choix entré ne corespond pas à un choix valide. choisisser à nouveau")
+        clean_screen()
         return choice
 
     def enter_player_info(self):
@@ -110,10 +115,9 @@ class View:
         print("Choisisez les joueurs participant à ce tournois\n")
         print(player_list["valid_players_string"])
         print("entrer le numero du joueur à ajouter")
-        print(player_list["valid_players_id"])
         good_choice = False
         while not good_choice:
-            choice = input("choix : ")
+            choice = input("\nchoix : ")
             print(choice.isdigit())
             if choice.isdigit() and int(choice) in player_list["valid_players_id"]:
                 good_choice = True
@@ -132,7 +136,7 @@ class View:
 
     def show_match_info(self, match):
         print(
-            match.player1.ranking
+            str(match.player1.ranking)
             + " "
             + match.player1.firstname
             + " "
@@ -142,14 +146,14 @@ class View:
             + " "
             + match.player2.lastname
             + " "
-            + match.player2.ranking
+            + str(match.player2.ranking)
         )
 
     def enter_score_choice(self, match):
         clean_screen()
         print("\nchoisisez le score pour le match entre :\n")
         self.show_match_info(match)
-        print("1 : Victoire de " + match.player1.firstname + ' ' + match.player1.lastname)
+        print("\n1 : Victoire de " + match.player1.firstname + ' ' + match.player1.lastname)
         print("2 : Match Nul")
         print("3 : Victoire de " + match.player2.firstname + ' ' + match.player2.lastname)
         return self.ask_for_choice(3)
@@ -162,18 +166,28 @@ class View:
         '''
         clean_screen()
         tournament_ranking = 1
+        print("Classement du tournois / Score / Prenom / Nom (id du joueur) / Classement général\n")
         for player in sorted_list_player_by_score:
             print(
                 str(tournament_ranking)
                 + ' : ' +
+                str(player[1])
+                + " : " +
                 player[0].firstname
                 + ' ' +
                 player[0].lastname
-                + ' : ' +
-                str(player[1])
+                + ' (' +
+                str(player[0].player_id)
+                + ') : ' +
+                str(player[0].ranking)
             )
             tournament_ranking += 1
-        input("\nAppuyer sur ENTER pour continuer !\n")
+        print("\nPour modifier le classement général d'un joueur, entrer son numero id, si non, appuyer sur ENTER pour revenir au menu !\n")
+        choice = input("choix : ")
+        for player in sorted_list_player_by_score:
+            if str(player[0].player_id) == choice:
+                return player[0]
+        return ""
 
     def show_player_list(self, player_list):
         ''' Show basic player info from the player list given

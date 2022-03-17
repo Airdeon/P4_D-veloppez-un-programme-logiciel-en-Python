@@ -1,2 +1,1 @@
-- Ajouter la liste des tournois
-- Ajouter la possibiliter de modifier les info du joueur, principalement le ranking
+- revoir le check previous match

@@ -32,12 +32,12 @@ class Controller:
             choice = self.view.show_tournament_menu()
             match choice:
                 case "1":
-                    if self.players_data_base.get_number_of_player < 8:
+                    if self.players_data_base.get_number_of_player() < 8:
                         self.view.show_number_of_player_warning()
                     else:
                         self.create_tournament()
                 case "2":
-                    if len(self.tournament_data_base.available_tournament_list()) == 0:
+                    if len(self.tournament_data_base.get_available_tournament_list()) == 0:
                         self.view.show_number_of_tournament_warning()
                     else:
                         self.backup_tournament()
@@ -109,24 +109,39 @@ class Controller:
     def run_tournament(self):
         end_loop = False
         while not end_loop:
-            if len(self.tournament.rounds) < int(self.tournament.number_of_round):
-                tournament_status = "round"
-            else:
-                tournament_status = "finish"
 
-            choice = self.view.show_selected_tournament_menu(self.tournament.name, self.tournament.rounds[-1].end_datetime, tournament_status)
+            # Find tournament status
+            if len(self.tournament.rounds) == 0:
+                tournament_status = "not_started"
+            elif len(self.tournament.rounds) == int(self.tournament.number_of_round):
+                if self.tournament.rounds[-1].end_datetime == "":
+                    tournament_status = "enter_score"
+                else:
+                    tournament_status = "finish"
+            else:
+                if self.tournament.rounds[-1].end_datetime == "":
+                    tournament_status = "enter_score"
+                else:
+                    tournament_status = "start_new_round"
+
+            choice = self.view.show_selected_tournament_menu(self.tournament.name, tournament_status)
             match choice:
                 case "1":
-                    print(self.round_status)
-                    if self.tournament.rounds[-1].end_datetime == "":
+                    if tournament_status == "enter_score":
                         self.define_score()
-                    elif tournament_status == "round":
+                    elif tournament_status == "start_new_round" or tournament_status == "not_started":
                         self.launch_round()
-                    elif tournament_status == "finish" and self.round_status == "":
-                        self.view.show_score(self.tournament.get_score())
+                    elif tournament_status == "finish":
+                        playerchoice = self.view.show_score(self.tournament.get_score())
+                        if playerchoice != "":
+                            playerchoice.update_ranking(self.view.change_player_ranking(playerchoice))
                 case "2":
-                    playerchoice = self.view.show_player_list(self.tournament.players)
-                    if playerchoice != "":
-                        playerchoice.update_ranking(self.view.change_player_ranking(playerchoice))
+                    if tournament_status != "finish":
+                        playerchoice = self.view.show_score(self.tournament.get_score())
+                        if playerchoice != "":
+                            playerchoice.update_ranking(self.view.change_player_ranking(playerchoice))
+                    else:
+                        end_loop = True
                 case "3":
-                    end_loop = True
+                    if tournament_status != "finish":
+                        end_loop = True
