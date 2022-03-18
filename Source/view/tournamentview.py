@@ -151,9 +151,10 @@ class TournamentView:
                 round_list : list of round instance
         """
         for round in round_list:
-            round_string = '\n ## ' + round.round_name + ' Commencer le ' + round.start_datetime[0:19]
+            round_string = '\n\n ## ' + round.round_name + ' Commencer le ' + round.start_datetime[0:19]
             if round.end_datetime != "":
                 round_string += ' et terminé le ' + round.end_datetime[0:19]
+            round_string += "\n"
             print(round_string)
             for match in round.matchs:
                 self.show_match_info(match)

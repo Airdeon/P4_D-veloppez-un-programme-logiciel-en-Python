@@ -10,7 +10,8 @@ Pour créer l'environnement virtuel, placez-vous dans le dossier du projet, puis
 python -m venv env
 ```
 
-Activé le ensuite en executant la commande suivante sous windows :
+Activé le ensuite en executant la commande suivante
+windows :
 powershell :
 ```
 env\Scripts\activate
@@ -25,18 +26,18 @@ Mac\Linux :
 source env/bin/activate
 ```
 
-Installer les dépendances :
+#### Installer les dépendances :
 ```
 pip install -r requirements.txt
 ```
 ### lancement
-D
+Déplacez-vous dans le dossier Source.
 ```
-cd Source/
+cd .\Source\
 ```
 Vous pouvez maintenant lancer le programme :
 ```
-python P2_WebScraping.py
+python python .\chess.py
 ```
 ### Verification avec flake8-html
 Pour lancer la vérification, lancer la commande suivante :
