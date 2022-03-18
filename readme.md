@@ -26,7 +26,7 @@ Mac\Linux :
 source env/bin/activate
 ```
 
-#### Installer les dépendances :
+### Installer les dépendances :
 ```
 pip install -r requirements.txt
 ```
