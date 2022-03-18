@@ -5,7 +5,7 @@
 #### version de python 3.10.2
 
 ### instalation
-Pour créer l'environnement virtuel, placez-vous dans le dossier source du projet, puis exécutez la commande suivante :
+Pour créer l'environnement virtuel, placez-vous dans le dossier du projet, puis exécutez la commande suivante :
 ```
 python -m venv env
 ```

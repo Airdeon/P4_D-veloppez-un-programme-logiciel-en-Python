@@ -15,6 +15,7 @@ class Round:
             round_serialized = self.round_table.get(all, int(round_id))
             self.round_name = round_serialized["round_name"]
             match_id = round_serialized["matchs"]
+            self.start_datetime = round_serialized["start_datetime"]
             self.end_datetime = round_serialized["end_datetime"]
             self.matchs = []
             for match in match_id:

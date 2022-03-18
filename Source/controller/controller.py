@@ -1,4 +1,5 @@
-from view.view import View
+from view.mainview import MainView
+from view.tournamentview import TournamentView
 from model.player import Player, PlayerDataBase
 from model.tournament import Tournament, TournamentDataBase
 from model.round import Round
@@ -7,7 +8,8 @@ from model.round import Round
 class Controller:
     def __init__(self):
         self.players = []
-        self.view = View()
+        self.mainview = MainView()
+        self.tournamentview = TournamentView()
         self.round_status = ""
         self.players_data_base = PlayerDataBase()
         self.tournament_data_base = TournamentDataBase()
@@ -16,7 +18,7 @@ class Controller:
         """Run main programme"""
         end_loop = False
         while not end_loop:
-            choice = self.view.show_main_menu()
+            choice = self.mainview.show_main_menu()
             match choice:
                 case "1":
                     self.tournament_menu()
@@ -29,20 +31,22 @@ class Controller:
         """Selector for tournament menu"""
         end_loop = False
         while not end_loop:
-            choice = self.view.show_tournament_menu()
+            choice = self.mainview.show_tournament_menu()
             match choice:
                 case "1":
                     if self.players_data_base.get_number_of_player() < 8:
-                        self.view.show_number_of_player_warning()
+                        self.mainview.show_number_of_player_warning()
                     else:
                         self.create_tournament()
                 case "2":
                     if len(self.tournament_data_base.get_available_tournament_list()) == 0:
-                        self.view.show_number_of_tournament_warning()
+                        self.mainview.show_number_of_tournament_warning()
                     else:
                         self.backup_tournament()
                 case "3":
-                    tournament_choice = self.view.show_tournament_list(self.tournament_data_base.get_tournament_list())
+                    tournament_choice = (
+                        self.mainview.show_tournament_list(self.tournament_data_base.get_tournament_list())
+                        )
                     if tournament_choice != "":
                         self.tournament = tournament_choice
                         self.run_tournament()
@@ -53,23 +57,25 @@ class Controller:
         """selector for player management menu"""
         end_loop = False
         while not end_loop:
-            choice = self.view.show_player_management_menu()
+            choice = self.mainview.show_player_management_menu()
             match choice:
                 case "1":
-                    playerchoice = self.view.show_player_list(self.players_data_base.get_player_list())
+                    playerchoice = self.mainview.show_player_list(self.players_data_base.get_player_list())
                     if playerchoice != "":
-                        playerchoice.update_ranking(self.view.change_player_ranking(playerchoice))
+                        playerchoice.update_ranking(self.mainview.change_player_ranking(playerchoice))
                 case "2":
-                    Player(player_info=self.view.enter_player_info())
+                    Player(player_info=self.mainview.enter_player_info())
                 case "3":
                     end_loop = True
 
     def create_tournament(self):
         """create new tournament and launch it"""
-        tournament_info = self.view.enter_tournament_info()
+        tournament_info = self.tournamentview.enter_tournament_info()
         players = []
         for player in range(int(tournament_info["number_of_player"])):
-            players.append(self.view.choice_player(self.players_data_base.get_player_available_list(players)))
+            players.append(
+                self.tournamentview.choice_player(self.players_data_base.get_player_available_list(players))
+                )
         tournament_info["players"] = players
         tournament_info["rounds"] = []
         self.tournament = Tournament(tournament_info=tournament_info)
@@ -77,7 +83,9 @@ class Controller:
 
     def backup_tournament(self):
         """get back an existing tournament from the database"""
-        tournament_choice = self.view.show_tournament_list(self.tournament_data_base.get_available_tournament_list())
+        tournament_choice = (
+            self.mainview.show_tournament_list(self.tournament_data_base.get_available_tournament_list())
+            )
         if tournament_choice != "":
             self.tournament = tournament_choice
             self.run_tournament()
@@ -87,13 +95,12 @@ class Controller:
         self.tournament.rounds.append(Round(self.tournament))
         self.tournament.update()
         for match in self.tournament.rounds[-1].matchs:
-            self.view.show_match_info(match)
+            self.tournamentview.show_match_info(match)
 
     def define_score(self):
         """ Change player score depend of who win"""
-        print(self.tournament.rounds)
         for match in self.tournament.rounds[-1].matchs:
-            choice = self.view.enter_score_choice(match)
+            choice = self.tournamentview.enter_score_choice(match)
             match choice:
                 case "1":
                     match.player1_score = 1
@@ -127,7 +134,7 @@ class Controller:
                 else:
                     tournament_status = "start_new_round"
             # launch function depend of player choice and tournament status
-            choice = self.view.show_selected_tournament_menu(self.tournament.name, tournament_status)
+            choice = self.tournamentview.show_selected_tournament_menu(self.tournament.name, tournament_status)
             match choice:
                 case "1":
                     if tournament_status == "enter_score":
@@ -135,28 +142,28 @@ class Controller:
                     elif tournament_status == "start_new_round" or tournament_status == "not_started":
                         self.launch_round()
                     elif tournament_status == "finish":
-                        playerchoice = self.view.show_score(self.tournament.get_score())
+                        playerchoice = self.tournamentview.show_score(self.tournament.get_score())
                         if playerchoice != "":
                             playerchoice.update_ranking(self.view.change_player_ranking(playerchoice))
                 case "2":
                     if tournament_status != "finish":
-                        playerchoice = self.view.show_score(self.tournament.get_score())
+                        playerchoice = self.tournamentview.show_score(self.tournament.get_score())
                         if playerchoice != "":
                             playerchoice.update_ranking(self.view.change_player_ranking(playerchoice))
                     else:
-                        playerchoice = self.view.show_player_list(self.tournament.players)
+                        playerchoice = self.mainview.show_player_list(self.tournament.players)
                         if playerchoice != "":
                             playerchoice.update_ranking(self.view.change_player_ranking(playerchoice))
                 case "3":
                     if tournament_status != "finish":
-                        playerchoice = self.view.show_player_list(self.tournament.players)
+                        playerchoice = self.mainview.show_player_list(self.tournament.players)
                         if playerchoice != "":
                             playerchoice.update_ranking(self.view.change_player_ranking(playerchoice))
                     else:
-                        self.view.show_match_list(self.tournament.rounds)
+                        self.tournamentview.show_match_list(self.tournament.rounds)
                 case "4":
                     if tournament_status != "finish":
-                        self.view.show_match_list(self.tournament.rounds)
+                        self.tournamentview.show_match_list(self.tournament.rounds)
                     else:
                         end_loop = True
                 case "5":

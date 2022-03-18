@@ -23,29 +23,6 @@ class PlayerDataBase:
                 player_list.append(Player(player_id=player.doc_id))
         return player_list
 
-    def get_player_available_list2(self, players_already_pick):
-        """ get a list of every players available """
-        valid_players_id = []
-        valid_players_string = ""
-        total_number_of_player = self.players_table.count(all)
-        for index_player in range(1, total_number_of_player+1):
-            player_line_serialized = self.players_table.get(all, index_player)
-            player_line = (
-                str(index_player)
-                + " " +
-                player_line_serialized['lastname']
-                + " " +
-                player_line_serialized['firstname']
-            )
-            if index_player not in players_already_pick:
-                valid_players_id.append(index_player)
-                valid_players_string += player_line + "\n"
-        player_list = {
-            "valid_players_id": valid_players_id,
-            "valid_players_string": valid_players_string
-        }
-        return player_list
-
     def get_player_list(self):
         """ return object list of all players in database"""
         player_list = []
