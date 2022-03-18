@@ -2,7 +2,7 @@
 
 ### programme permettant de géré des tournois d'echecs
 
-#### version de python 3.10.2
+#### version de python minimum 3.10
 
 ### instalation
 Pour créer l'environnement virtuel, placez-vous dans le dossier du projet, puis exécutez la commande suivante :
@@ -37,8 +37,11 @@ cd .\Source\
 ```
 Vous pouvez maintenant lancer le programme :
 ```
-python python .\chess.py
+python .\chess.py
 ```
+### Utilisation du programme
+laissez-vous guidé par le programme
+
 ### Verification avec flake8-html
 Pour lancer la vérification, lancer la commande suivante :
 ```
