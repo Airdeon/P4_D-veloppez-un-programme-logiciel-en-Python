@@ -83,12 +83,14 @@ class Controller:
             self.run_tournament()
 
     def launch_round(self):
+        """ create new round in rounds list """
         self.tournament.rounds.append(Round(self.tournament))
         self.tournament.update()
         for match in self.tournament.rounds[-1].matchs:
             self.view.show_match_info(match)
 
     def define_score(self):
+        """ Change player score depend of who win"""
         print(self.tournament.rounds)
         for match in self.tournament.rounds[-1].matchs:
             choice = self.view.enter_score_choice(match)
@@ -107,10 +109,11 @@ class Controller:
             self.tournament.rounds[-1].round_status = ""
 
     def run_tournament(self):
+        """ Main tournament choice menu """
         end_loop = False
         while not end_loop:
 
-            # Find tournament status
+            # looking for tournament status
             if len(self.tournament.rounds) == 0:
                 tournament_status = "not_started"
             elif len(self.tournament.rounds) == int(self.tournament.number_of_round):
@@ -123,7 +126,7 @@ class Controller:
                     tournament_status = "enter_score"
                 else:
                     tournament_status = "start_new_round"
-
+            # launch function depend of player choice and tournament status
             choice = self.view.show_selected_tournament_menu(self.tournament.name, tournament_status)
             match choice:
                 case "1":
@@ -141,7 +144,21 @@ class Controller:
                         if playerchoice != "":
                             playerchoice.update_ranking(self.view.change_player_ranking(playerchoice))
                     else:
-                        end_loop = True
+                        playerchoice = self.view.show_player_list(self.tournament.players)
+                        if playerchoice != "":
+                            playerchoice.update_ranking(self.view.change_player_ranking(playerchoice))
                 case "3":
+                    if tournament_status != "finish":
+                        playerchoice = self.view.show_player_list(self.tournament.players)
+                        if playerchoice != "":
+                            playerchoice.update_ranking(self.view.change_player_ranking(playerchoice))
+                    else:
+                        self.view.show_match_list(self.tournament.rounds)
+                case "4":
+                    if tournament_status != "finish":
+                        self.view.show_match_list(self.tournament.rounds)
+                    else:
+                        end_loop = True
+                case "5":
                     if tournament_status != "finish":
                         end_loop = True

@@ -1,5 +1,4 @@
 from controller.controller import Controller
-from view.view import View
 
 
 def main():

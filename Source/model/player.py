@@ -2,21 +2,41 @@ from tinydb import TinyDB
 
 
 class PlayerDataBase:
+    """ Acces to player database """
     def __init__(self):
+        """ Init database """
         db = TinyDB('./db.json')
         self.players_table = db.table('players')
 
     def get_number_of_player(self):
+        """ return the number of player in database"""
         return self.players_table.count(all)
 
     def get_player_available_list(self, players_already_pick):
-        ''' get a list of every player available '''
+        player_list = []
+        for player in self.players_table:
+            player_pick = False
+            for playerpick in players_already_pick:
+                if player.doc_id == playerpick.player_id:
+                    player_pick = True
+            if not player_pick:
+                player_list.append(Player(player_id=player.doc_id))
+        return player_list
+
+    def get_player_available_list2(self, players_already_pick):
+        """ get a list of every players available """
         valid_players_id = []
         valid_players_string = ""
         total_number_of_player = self.players_table.count(all)
         for index_player in range(1, total_number_of_player+1):
             player_line_serialized = self.players_table.get(all, index_player)
-            player_line = str(index_player) + " " + player_line_serialized['lastname'] + " " + player_line_serialized['firstname']
+            player_line = (
+                str(index_player)
+                + " " +
+                player_line_serialized['lastname']
+                + " " +
+                player_line_serialized['firstname']
+            )
             if index_player not in players_already_pick:
                 valid_players_id.append(index_player)
                 valid_players_string += player_line + "\n"
@@ -27,6 +47,7 @@ class PlayerDataBase:
         return player_list
 
     def get_player_list(self):
+        """ return object list of all players in database"""
         player_list = []
         for player in self.players_table:
             player_list.append(Player(player_id=player.doc_id))
@@ -64,9 +85,11 @@ class Player:
         }
         return self.players_table.insert(player_info)
 
-    def __str__(self):
-        return self.player_id
-
     def update_ranking(self, new_ranking):
+        """ Update ranking of the player in database
+
+            attr:
+                new_ranking : a new ranking integer number
+        """
         self.ranking = new_ranking
         self.players_table.update({"ranking": self.ranking}, doc_ids=[self.player_id])

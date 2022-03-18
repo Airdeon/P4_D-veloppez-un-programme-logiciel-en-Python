@@ -5,12 +5,13 @@ from .round import Round
 
 
 class TournamentDataBase:
+    """ Acces to tournament database """
     def __init__(self):
         db = TinyDB("./db.json")
         self.tournament_table = db.table("tournaments")
 
     def get_available_tournament_list(self):
-        """get list of unfinished tournament from the database"""
+        """ Get list of unfinished tournament from the database """
         tournament = Query()
         tournament_line = self.tournament_table.search(tournament.end_date == "")
         tournament_list = []
@@ -19,6 +20,7 @@ class TournamentDataBase:
         return tournament_list
 
     def get_tournament_list(self):
+        """ Get list of all tournament """
         tournament_list = []
         for tournament in self.tournament_table:
             tournament_list.append(Tournament(tournament_id=tournament.doc_id))
@@ -39,19 +41,20 @@ class Tournament:
             self.tournament_id = tournament_id
             self.start_date = tournament_info["start_date"]
             self.end_date = tournament_info["end_date"]
+            self.players = []
+            for player_id in tournament_info["players"]:
+                player = Player(player_id=player_id)
+                self.players.append(player)
         else:
             self.start_date = str(datetime.now())
             self.end_date = ""
+            self.players = tournament_info["players"]
         self.name = tournament_info["name"]
         self.place = tournament_info["place"]
         self.number_of_round = tournament_info["number_of_round"]
         self.description = tournament_info["description"]
         self.time_controle = tournament_info["time_controle"]
         self.number_of_player = tournament_info["number_of_player"]
-        self.players = []
-        for player_id in tournament_info["players"]:
-            player = Player(player_id=player_id)
-            self.players.append(player)
         self.rounds = []
         for round_id in tournament_info["rounds"]:
             round = Round(self, round_id)
@@ -60,6 +63,10 @@ class Tournament:
             self.tournament_id = self.save_new_tournament()
 
     def save_new_tournament(self):
+        """Insert player in database
+
+        returns: id of the player in database
+        """
         tournament_info = {
             "name": self.name,
             "place": self.place,
@@ -75,6 +82,7 @@ class Tournament:
         return self.tournament_table.insert(tournament_info)
 
     def update(self):
+        """update rounds list and tournament finish date in database"""
         self.tournament_table.update({
             "rounds": [round.round_id for round in self.rounds],
             "end_date": self.end_date,
@@ -82,6 +90,7 @@ class Tournament:
             doc_ids=[self.tournament_id])
 
     def get_score(self):
+        """ get list of player sorted by score """
         player_score = {}
         for round in self.rounds:
             for match in round.matchs:
@@ -100,5 +109,6 @@ class Tournament:
         return sorted(player_score.items(), key=lambda x: (x[1], x[0].ranking), reverse=True)
 
     def finish_tournament(self):
+        """ init end date and save it"""
         self.end_date = str(datetime.now())
         self.update()

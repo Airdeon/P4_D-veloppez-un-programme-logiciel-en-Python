@@ -3,8 +3,9 @@ from .player import Player
 
 
 class Match:
+    """ A Match object contain the 2 player object and score """
     def __init__(self, match_id=None, player1=None, player2=None):
-        # init Database
+        """ init database """
         db = TinyDB("./db.json")
         self.match_table = db.table("match")
 
@@ -36,4 +37,8 @@ class Match:
 
     def save_match_result(self):
         """Update player score in database"""
-        self.match_table.update({"player1_score": self.player1_score, "player2_score": self.player2_score}, doc_ids=[self.match_id])
+        self.match_table.update({
+            "player1_score": self.player1_score,
+            "player2_score": self.player2_score
+            },
+            doc_ids=[self.match_id])
