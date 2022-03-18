@@ -1,4 +1,4 @@
-from .utils import clean_screen, ask_for_choice
+from .utils import clean_screen, ask_for_choice, check_number, check_name
 
 
 class TournamentView:
@@ -30,10 +30,10 @@ class TournamentView:
         clean_screen()
         print("## Entrer les information du nouveau tournois ##\n")
         tournament = {
-            "name": input("Nom du tournois : "),
+            "name": check_name("Nom : "),
             "place": input("Lieu du tournois : "),
-            "number_of_round": input("Nombre de tour (par defaut : 4) : ") or "4",
             "description": input("Description : "),
+            "number_of_round": check_number("Nombre de tour (par defaut : 4) : ", "4")
         }
         print("type de controle du temps :")
         print("1 : Bullet")

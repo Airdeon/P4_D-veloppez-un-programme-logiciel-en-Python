@@ -62,9 +62,16 @@ class Controller:
             match choice:
                 case "1":
                     order_type = self.mainview.ask_for_order_type()
-                    playerchoice = self.mainview.show_player_list(self.players_data_base.get_player_list(), order_type)
-                    if playerchoice != "":
-                        playerchoice.update_ranking(self.mainview.change_player_ranking(playerchoice))
+                    loop = True
+                    while loop:
+                        playerchoice = self.mainview.show_player_list(
+                            self.players_data_base.get_player_list(), order_type
+                            )
+                        if playerchoice != "":
+                            playerchoice.update_ranking(self.mainview.change_player_ranking(playerchoice))
+                        else:
+                            loop = False
+                            clean_screen()
                 case "2":
                     Player(player_info=self.mainview.enter_player_info())
                 case "3":

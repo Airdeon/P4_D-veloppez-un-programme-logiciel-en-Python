@@ -1,4 +1,4 @@
-from .utils import clean_screen, ask_for_choice
+from .utils import clean_screen, ask_for_choice, check_number, check_name
 
 
 class MainView:
@@ -43,20 +43,11 @@ class MainView:
         clean_screen()
         print("Entrer les informations du nouveau joueurs")
         player = {}
-        player["lastname"] = input("nom : ")
-        player["firstname"] = input("prenom : ")
-        player["birthday"] = input("date de naissance : ")
-        player["sex"] = input("sexe : ")
-        good_value = False
-        while not good_value:
-            response = input("Classement : ")
-            try:
-                ranking = int(response)
-                if ranking > 0:
-                    good_value = True
-            except ValueError:
-                print("\nLa valeur entré n'est pas valide, entrer un nombre entier positif")
-        player["ranking"] = ranking
+        player["lastname"] = check_name("Nom : ")
+        player["firstname"] = check_name("Prenom : ")
+        player["birthday"] = input("Date de naissance : ")
+        player["sex"] = input("Sexe : ")
+        player["ranking"] = check_number("Classement : ")
         print("\nJoueur sauvegarder !")
         input("\nAppuyer sur ENTER pour continuer !\n")
         return player
@@ -154,14 +145,4 @@ class MainView:
             + str(player.ranking)
             )
         print(player_string)
-        good_value = False
-        while not good_value:
-            response = input("Classement : ")
-            try:
-                ranking = int(response)
-                if ranking > 0:
-                    good_value = True
-            except ValueError:
-                print("\nLa valeur entré n'est pas valide, entrer un nombre entier positif")
-        print("nouveau classement enregistré\n\n")
-        return ranking
+        return check_number("classement : ")
