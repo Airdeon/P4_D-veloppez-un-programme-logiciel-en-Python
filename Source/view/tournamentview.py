@@ -118,7 +118,6 @@ class TournamentView:
             attr:
                 sorted_list_player_by_score : sorted list of player order by score descendant
         '''
-        clean_screen()
         tournament_ranking = 1
         print("Classement du tournois / Score / Prenom / Nom (id du joueur) / Classement général\n")
         for player in sorted_list_player_by_score:

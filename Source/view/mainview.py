@@ -52,9 +52,10 @@ class MainView:
             response = input("Classement : ")
             try:
                 ranking = int(response)
-                good_value = True
+                if ranking > 0:
+                    good_value = True
             except ValueError:
-                print("\nLa valeur entré n'est pas valide, entrer un nombre entier")
+                print("\nLa valeur entré n'est pas valide, entrer un nombre entier positif")
         player["ranking"] = ranking
         print("\nJoueur sauvegarder !")
         input("\nAppuyer sur ENTER pour continuer !\n")
@@ -69,18 +70,22 @@ class MainView:
             tournament_number += 1
         return ask_for_choice(len(list_of_available_tounament))
 
-    def show_player_list(self, player_list):
+    def ask_for_order_type(self):
+        clean_screen()
+        print("## choix du type de classement ##\n")
+        print("1 : Par ordre alphabetique")
+        print("2 : Par classement\n")
+        return ask_for_choice(2)
+
+    def show_player_list(self, player_list, order_type):
         ''' Show basic player info from the player list given
 
             attr:
                 player_list : list of players to show
         '''
-        print("1 : Par ordre alphabetique")
-        print("2 : Par classement")
-        choice = ask_for_choice(2)
-        if choice == "1":
+        if order_type == "1":
             sorted_list = sorted(player_list, key=lambda player: player.lastname)
-        elif choice == "2":
+        elif order_type == "2":
             sorted_list = sorted(player_list, key=lambda player: player.ranking)
         clean_screen()
         print("\n\n## Liste des Joueurs ##\n")
@@ -139,6 +144,7 @@ class MainView:
             attr :
                 player : instance of Player
         """
+        clean_screen()
         player_string = (
             "\nle classement actuelle de "
             + player.firstname
@@ -150,12 +156,12 @@ class MainView:
         print(player_string)
         good_value = False
         while not good_value:
-            response = input("enter son nouveau classement : ")
+            response = input("Classement : ")
             try:
                 ranking = int(response)
-                good_value = True
+                if ranking > 0:
+                    good_value = True
             except ValueError:
-                print("\nLa valeur entré n'est pas valide, entrer un nombre entier")
-
-        print("nouveau classement enregistré")
+                print("\nLa valeur entré n'est pas valide, entrer un nombre entier positif")
+        print("nouveau classement enregistré\n\n")
         return ranking

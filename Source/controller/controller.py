@@ -1,3 +1,4 @@
+from view.utils import clean_screen
 from view.mainview import MainView
 from view.tournamentview import TournamentView
 from model.player import Player, PlayerDataBase
@@ -60,7 +61,8 @@ class Controller:
             choice = self.mainview.show_player_management_menu()
             match choice:
                 case "1":
-                    playerchoice = self.mainview.show_player_list(self.players_data_base.get_player_list())
+                    order_type = self.mainview.ask_for_order_type()
+                    playerchoice = self.mainview.show_player_list(self.players_data_base.get_player_list(), order_type)
                     if playerchoice != "":
                         playerchoice.update_ranking(self.mainview.change_player_ranking(playerchoice))
                 case "2":
@@ -142,23 +144,45 @@ class Controller:
                     elif tournament_status == "start_new_round" or tournament_status == "not_started":
                         self.launch_round()
                     elif tournament_status == "finish":
-                        playerchoice = self.tournamentview.show_score(self.tournament.get_score())
-                        if playerchoice != "":
-                            playerchoice.update_ranking(self.view.change_player_ranking(playerchoice))
+                        loop = True
+                        while loop:
+                            playerchoice = self.tournamentview.show_score(self.tournament.get_score())
+                            if playerchoice != "":
+                                playerchoice.update_ranking(self.mainview.change_player_ranking(playerchoice))
+                            else:
+                                loop = False
+                                clean_screen()
                 case "2":
                     if tournament_status != "finish":
-                        playerchoice = self.tournamentview.show_score(self.tournament.get_score())
-                        if playerchoice != "":
-                            playerchoice.update_ranking(self.view.change_player_ranking(playerchoice))
+                        loop = True
+                        while loop:
+                            playerchoice = self.tournamentview.show_score(self.tournament.get_score())
+                            if playerchoice != "":
+                                playerchoice.update_ranking(self.mainview.change_player_ranking(playerchoice))
+                            else:
+                                loop = False
+                                clean_screen()
                     else:
-                        playerchoice = self.mainview.show_player_list(self.tournament.players)
-                        if playerchoice != "":
-                            playerchoice.update_ranking(self.view.change_player_ranking(playerchoice))
+                        order_type = self.mainview.ask_for_order_type()
+                        loop = True
+                        while loop:
+                            playerchoice = self.mainview.show_player_list(self.tournament.players, order_type)
+                            if playerchoice != "":
+                                playerchoice.update_ranking(self.mainview.change_player_ranking(playerchoice))
+                            else:
+                                loop = False
+                                clean_screen()
                 case "3":
                     if tournament_status != "finish":
-                        playerchoice = self.mainview.show_player_list(self.tournament.players)
-                        if playerchoice != "":
-                            playerchoice.update_ranking(self.view.change_player_ranking(playerchoice))
+                        order_type = self.mainview.ask_for_order_type()
+                        loop = True
+                        while loop:
+                            playerchoice = self.mainview.show_player_list(self.tournament.players, order_type)
+                            if playerchoice != "":
+                                playerchoice.update_ranking(self.mainview.change_player_ranking(playerchoice))
+                            else:
+                                loop = False
+                                clean_screen()
                     else:
                         self.tournamentview.show_match_list(self.tournament.rounds)
                 case "4":
