@@ -5,11 +5,12 @@ from .match import Match
 
 class Round:
     def __init__(self, tournament, round_id=None):
-        """ Init player object """
+        """ Init Round Object """
         db = TinyDB("./db.json")
         self.round_table = db.table("round")
         self.tournament = tournament
         self.half_of_player = int(len(self.tournament.players) / 2)
+        # if round already exist
         if round_id is not None:
             self.round_id = round_id
             round_serialized = self.round_table.get(all, int(round_id))
